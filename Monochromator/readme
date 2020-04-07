@@ -8,3 +8,38 @@ This program is based on the Geant4 OpNovice example
 and is used to simulate the Edinburgh Monchromator
 equipment which was used to test the reflectivity of
 Tyvek, Aluminium, Paper and Black Paint.
+
+------------
+How to Build 
+------------
+
+Make a new directory to store the build version executable
+--
+$ mkdir ../Monochromator-build/
+$ cd ../Monochromator-build/
+
+Prepare the build   
+--
+(NB this will depend on the status of your environment settings)
+See e.g. - http://geant4-userdoc.web.cern.ch/geant4-userdoc/UsersGuides/ForApplicationDeveloper/html/GettingStarted/makeFile.html#building-exampleb1-with-cmake-on-unix-with-makefiles
+
+$ cmake -DGeant4_DIR=~/software/modern/geant_install/share/Geant4-10.4.3/geant4make/ ../Monochromator
+
+OR, if the location of Geant4Config.cmake is known by your environment 
+$ cmake ../Monochromator
+
+Compile the executable
+--
+$ make
+
+-------------
+How to Run 
+------------
+
+Run using the GUI
+--
+$ ./MonoChrom
+
+(In interactive session) fire a beam of multi-coloured photons
+Session: /control/execute Rainbow.mac
+

@@ -405,17 +405,17 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   
   opTyvekSurface->SetSigmaAlpha(0.23); // 0.0 rad means no lobe
   
-//   G4LogicalBorderSurface* darkBoxSurface =
-//     new G4LogicalBorderSurface("DarkBoxSurface",
-// 			       darkBox_phys,
-// 			       expHall_phys,
-// 			       opDarkBoxSurface); // opTyvekSurface
+  G4LogicalBorderSurface* darkBoxSurface =
+    new G4LogicalBorderSurface("DarkBoxSurface",
+			       darkBox_phys,
+			       expHall_phys,
+			       opDarkBoxSurface); // opTyvekSurface
  
-  G4LogicalSkinSurface* darkBoxSurface =
-    new G4LogicalSkinSurface("DarkBoxSurface",
-			     darkBox_phys,
-			     expHall_phys,
-			     opDarkBoxSurface); 
+//   G4LogicalSkinSurface* darkBoxSurface =
+//     new G4LogicalSkinSurface("DarkBoxSurface",
+// 			     darkBox_phys,
+// 			     expHall_phys,
+// 			     opDarkBoxSurface); 
   // print info
   G4OpticalSurface* opticalSurface = dynamic_cast <G4OpticalSurface*>
     (darkBoxSurface->GetSurface(darkBox_phys,expHall_phys)->
