@@ -1,0 +1,10 @@
+7th April 2020 
+WATCHMAN stand-alone optical simulations repository
+
+Email issues and suggestions to:
+gary.smith@ed.ac.uk
+
+Developed from the Geant4 OpNovice example, these programs are being used
+to simulate WATCHMAN optics including but not limited to the reflective 
+material Tyvek. Tyvek will be used in the Outer Detector which is used as 
+a cosmics veto.

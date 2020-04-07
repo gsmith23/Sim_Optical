@@ -1,0 +1,10 @@
+7th April 2020 
+Edinburgh monchromator Tyvek reflectivity test.
+
+Email issues and suggestions to:
+gary.smith@ed.ac.uk
+
+This program is based on the Geant4 OpNovice example
+and is used to simulate the Edinburgh Monchromator
+equipment which was used to test the reflectivity of
+Tyvek, Aluminium, Paper and Black Paint.
