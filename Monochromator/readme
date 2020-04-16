@@ -13,7 +13,7 @@ Tyvek, Aluminium, Paper and Black Paint.
 How to Build 
 ------------
 
-Make a new directory to store the build version executable
+Make a new directory to store the build version executable 
 --
 $ mkdir ../Monochromator-build/
 $ cd ../Monochromator-build/
@@ -40,6 +40,6 @@ Run using the GUI
 --
 $ ./MonoChrom
 
-(In interactive session) fire a beam of multi-coloured photons
-Session: /control/execute Rainbow.mac
+In the interactive session do:
+/run/beamOn 1
 
