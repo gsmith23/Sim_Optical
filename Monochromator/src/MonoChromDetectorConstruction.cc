@@ -41,6 +41,7 @@
 #include "G4LogicalSkinSurface.hh"
 #include "G4OpticalSurface.hh"
 #include "G4Box.hh"
+#include "G4Trd.hh"
 #include "G4LogicalVolume.hh"
 #include "G4ThreeVector.hh"
 #include "G4PVPlacement.hh"
@@ -59,6 +60,8 @@ MonoChromDetectorConstruction::MonoChromDetectorConstruction()
   // http://protectiontechnologies.dupont.com/tyvek-graphics-na-product-selector
   // 1082D 257 um thick, 105 gsm  
   fTyvek_z   = 0.01375*cm; 
+
+
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -75,8 +78,8 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   
   G4NistManager* nist = G4NistManager::Instance();
   
-//   G4double a, z, density;
-//   G4int nelements;
+   G4double a, z, density;
+   //G4int nelements;
   
   //-------------
   // Air
@@ -89,7 +92,17 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   //  air->AddElement(N, 70.*perCent);
   //  air->AddElement(O, 30.*perCent);
   //-------------
-
+  
+  //-------------
+  // glass 
+  G4Element * H = new G4Element("H", "H", z=1., a=1.01*g/mole);
+  G4Element * C = new G4Element("C", "C", z=6., a=12.01*g/mole);
+  
+  G4Material* glass;
+  glass = new G4Material("Glass", density=1.032*g/cm3,2);
+  glass->AddElement(C,91.533*perCent);
+  glass->AddElement(H,8.467*perCent);
+  
   //-------------
   // Polyethelene
   //  /material/nist/listMaterials
@@ -112,7 +125,7 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   
   // array elements for optics
   static const G4int nElements = 2;
-  G4double photon_Energies[] = {1.7712027,6.1992093}; //[700,200] nm
+  G4double photon_Energies[] = {1.7712027*eV,6.1992093*eV}; //[700,200] nm
   
   
   //------------------------------------------------------
@@ -279,14 +292,18 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   //       1.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00,
   //       1.00, 1.00, 1.00, 1.00 };
   
-  G4double air_R_Indices[] = {1.0,1.0};
-  G4double pe_R_Indices[]  = {1.5,1.5};
+  G4double air_R_Indices[]   = {1.0,1.0};
+  G4double pe_R_Indices[]    = {1.5,1.5};
+  G4double glass_R_Indices[] = {1.0,2.0};
   
   G4MaterialPropertiesTable* air_Table = new G4MaterialPropertiesTable();
   air_Table->AddProperty("RINDEX", photon_Energies, air_R_Indices, nElements);
   
   G4MaterialPropertiesTable* tyvek_Table = new G4MaterialPropertiesTable();
   tyvek_Table->AddProperty("RINDEX", photon_Energies, pe_R_Indices, nElements);
+
+  G4MaterialPropertiesTable* glass_Table = new G4MaterialPropertiesTable();
+  glass_Table->AddProperty("RINDEX", photon_Energies, glass_R_Indices, nElements);
   
   G4cout << "\n Air G4MaterialPropertiesTable" << G4endl;
   air_Table->DumpTable();
@@ -294,9 +311,12 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   G4cout << "\n Tyvek G4MaterialPropertiesTable" << G4endl;
   tyvek_Table->DumpTable();
   
+  G4cout << "\n Glass G4MaterialPropertiesTable" << G4endl;
+  glass_Table->DumpTable();
+  
   air->SetMaterialPropertiesTable(air_Table);
   tyvek->SetMaterialPropertiesTable(tyvek_Table);
-  
+  glass->SetMaterialPropertiesTable(glass_Table);
 
   // --------------------------------------
   // ------------- Volumes ----------------
@@ -335,9 +355,39 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   G4RotationMatrix* yRot = new G4RotationMatrix;
   yRot->rotateY(-M_PI/4.*rad);
   
-  G4VPhysicalVolume* tyvekSheet_phys =
-    new G4PVPlacement(yRot,G4ThreeVector(0,0,0),tyvekSheet_log,"Tyvek",
+  G4VPhysicalVolume* tyvekSheet_phys = nullptr;
+  //     tyvekSheet_phys = new G4PVPlacement(yRot,G4ThreeVector(0,0,0),tyvekSheet_log,"Tyvek",
+  // 		      darkBox_log,false,0); 
+
+  // Prism
+  //  http://geant4-userdoc.web.cern.ch/geant4-userdoc/UsersGuides/ForApplicationDeveloper/BackupVersions/V10.4/html/Detector/Geometry/geomSolids.html
+
+  G4double prism_x1 = 0.25*m;
+  G4double prism_x2 = 0.00*m;
+  G4double prism_y1 = 0.25*m;
+  G4double prism_y2 = 0.25*m;
+  G4double prism_z  = 0.25*m;
+  
+  G4Trd * prism = new G4Trd("Prism",
+			    prism_x1,
+			    prism_x2,
+			    prism_y1,
+			    prism_y2,
+			    prism_z);
+  
+  G4LogicalVolume* prism_log
+    = new G4LogicalVolume(prism,
+			  glass,
+			  "Prism",
+			  0,0,0);
+  
+  yRot->rotateY(-M_PI/4.*rad);
+  
+  G4VPhysicalVolume* prism_phys =
+    new G4PVPlacement(yRot,G4ThreeVector(0,0,0),
+		      prism_log,"Prism",
 		      darkBox_log,false,0);
+  
   
   // ------------- Surfaces --------------
   //
@@ -433,24 +483,26 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   // 			     opTyvekSurface);
   
 
-  G4LogicalBorderSurface* tyvekSurface =
-    new G4LogicalBorderSurface("TyvekSurface",
-			       darkBox_phys,
-			       tyvekSheet_phys,
-			       opTyvekSurface);
+  if(tyvekSheet_phys){
+    G4LogicalBorderSurface* tyvekSurface =
+      new G4LogicalBorderSurface("TyvekSurface",
+				 darkBox_phys,
+				 tyvekSheet_phys,
+				 opTyvekSurface);
   
   
-  // print info
-  opticalSurface = dynamic_cast <G4OpticalSurface*>
-    (tyvekSurface->GetSurface(darkBox_phys,tyvekSheet_phys)->
-     GetSurfaceProperty());
-  //(tyvekSurface->GetSurface(tyvekSheet_log)->GetSurfaceProperty());
-  
-  if (opticalSurface) {
-    G4cout << "\n Tyvek Sheet surface properties " << G4endl;
-    opticalSurface->DumpInfo();
+    // print info
+    opticalSurface = dynamic_cast <G4OpticalSurface*>
+      (tyvekSurface->GetSurface(darkBox_phys,tyvekSheet_phys)->
+       GetSurfaceProperty());
+    //(tyvekSurface->GetSurface(tyvekSheet_log)->GetSurfaceProperty());
+    
+    if (opticalSurface) {
+      G4cout << "\n Tyvek Sheet surface properties " << G4endl;
+      opticalSurface->DumpInfo();
+    }
+    
   }
-  
   //------------------------------------------------------
   //---------- Surfaces G4MaterialPropertiesTables -------
   //
@@ -469,12 +521,13 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   
   G4MaterialPropertiesTable* darkBoxSurf_Table = new G4MaterialPropertiesTable();
 
-  darkBoxSurf_Table->AddProperty("REFLECTIVITY"         ,photon_Energies,
+  darkBoxSurf_Table->AddProperty("REFLECTIVITY",photon_Energies,
 				 darkBox_reflectivity ,nElements);
-  darkBoxSurf_Table->AddProperty("EFFICIENCY"           ,photon_Energies,
+  darkBoxSurf_Table->AddProperty("EFFICIENCY",photon_Energies,
 				 darkBox_efficiency   ,nElements);
-  darkBoxSurf_Table->AddProperty("RINDEX",                photon_Energies, refractiveIndex, nElements);
-
+  darkBoxSurf_Table->AddProperty("RINDEX",photon_Energies,
+				 refractiveIndex, nElements);
+  
   // darkBoxSurf_Table->AddProperty("SPECULARLOBECONSTANT",  photon_Energies, specularLobe,    nElements);
   // darkBoxSurf_Table->AddProperty("SPECULARSPIKECONSTANT", photon_Energies, specularSpike,   nElements);
   // darkBoxSurf_Table->AddProperty("BACKSCATTERCONSTANT",   photon_Energies, backScatter,     nElements);
