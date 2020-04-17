@@ -100,11 +100,11 @@
 #/vis/modeling/trajectories/drawByAttribute-0/interval6/setLineColourRGBA 255 162 0 1
 #/vis/modeling/trajectories/drawByAttribute-0/interval7/setLineColourRGBA 255 0 0 1
 
-/vis/modeling/trajectories/drawByAttribute-0/interval1/setLineColourRGBA 0.46 0 0.93 0.25
-/vis/modeling/trajectories/drawByAttribute-0/interval2/setLineColourRGBA 0 0.63 1 0.25 
-/vis/modeling/trajectories/drawByAttribute-0/interval3/setLineColourRGBA 0 1 0.88 0.25
-/vis/modeling/trajectories/drawByAttribute-0/interval4/setLineColourRGBA 0.41 1 0 0.25
-/vis/modeling/trajectories/drawByAttribute-0/interval4/setLineColourRGBA 0.41 1 0 0.25
-/vis/modeling/trajectories/drawByAttribute-0/interval5/setLineColourRGBA 0.98 1 0 0.25
-/vis/modeling/trajectories/drawByAttribute-0/interval6/setLineColourRGBA 1 0.64 0 0.25
-/vis/modeling/trajectories/drawByAttribute-0/interval7/setLineColourRGBA 1 0 0 0.25
+/vis/modeling/trajectories/drawByAttribute-0/interval1/setLineColourRGBA 0.46 0 0.93 0.5
+/vis/modeling/trajectories/drawByAttribute-0/interval2/setLineColourRGBA 0 0.63 1 0.5 
+/vis/modeling/trajectories/drawByAttribute-0/interval3/setLineColourRGBA 0 1 0.88 0.5
+/vis/modeling/trajectories/drawByAttribute-0/interval4/setLineColourRGBA 0.41 1 0 0.5
+/vis/modeling/trajectories/drawByAttribute-0/interval4/setLineColourRGBA 0.41 1 0 0.5
+/vis/modeling/trajectories/drawByAttribute-0/interval5/setLineColourRGBA 0.98 1 0 0.5
+/vis/modeling/trajectories/drawByAttribute-0/interval6/setLineColourRGBA 1 0.64 0 0.5
+/vis/modeling/trajectories/drawByAttribute-0/interval7/setLineColourRGBA 1 0 0 0.5
