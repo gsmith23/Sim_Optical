@@ -87,25 +87,25 @@ MonoChromPrimaryGeneratorAction::~MonoChromPrimaryGeneratorAction()
 void MonoChromPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   SetOptPhotonPolar();
+
+  fParticleGun->GeneratePrimaryVertex(anEvent);
   
   // G4double energies[] = {1.70*eV,2.05*eV,2.15*eV,2.30*eV,2.50*eV,
 // 			 2.65*eV,3.00*eV};
   
-  G4double energies[] = {1.68*eV,3.25*eV};
+//   G4double energies[] = {1.68*eV,3.25*eV};
   
-  G4double energy;
-  G4int    steps  = 20;
+//   G4double energy;
+//   G4int    steps  = 20;
 
-  for (int i = 0 ; i < steps; i++){
+//   for (int i = 0 ; i < steps; i++){
+//     energy = energies[0] + (G4double)i*(energies[1]-energies[0])/steps;
+//     G4cout << " energy = " << energy << G4endl;
+//     fParticleGun->SetParticleEnergy(energy);
+//     fParticleGun->GeneratePrimaryVertex(anEvent);
+//   }
 
-    energy = energies[0] + (G4double)i*(energies[1]-energies[0])/steps;
-    
-    G4cout << " energy = " << energy << G4endl;
 
-    fParticleGun->SetParticleEnergy(energy);
-    
-    fParticleGun->GeneratePrimaryVertex(anEvent);
-  }
 
 }
 

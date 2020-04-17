@@ -356,39 +356,9 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   yRot->rotateY(-M_PI/4.*rad);
   
   G4VPhysicalVolume* tyvekSheet_phys = nullptr;
-  //     tyvekSheet_phys = new G4PVPlacement(yRot,G4ThreeVector(0,0,0),tyvekSheet_log,"Tyvek",
-  // 		      darkBox_log,false,0); 
+  tyvekSheet_phys = new G4PVPlacement(yRot,G4ThreeVector(0,0,0),tyvekSheet_log,"Tyvek",
+				      darkBox_log,false,0); 
 
-  // Prism
-  //  http://geant4-userdoc.web.cern.ch/geant4-userdoc/UsersGuides/ForApplicationDeveloper/BackupVersions/V10.4/html/Detector/Geometry/geomSolids.html
-
-  G4double prism_x1 = 0.25*m;
-  G4double prism_x2 = 0.00*m;
-  G4double prism_y1 = 0.25*m;
-  G4double prism_y2 = 0.25*m;
-  G4double prism_z  = 0.25*m;
-  
-  G4Trd * prism = new G4Trd("Prism",
-			    prism_x1,
-			    prism_x2,
-			    prism_y1,
-			    prism_y2,
-			    prism_z);
-  
-  G4LogicalVolume* prism_log
-    = new G4LogicalVolume(prism,
-			  glass,
-			  "Prism",
-			  0,0,0);
-  
-  yRot->rotateY(-M_PI/4.*rad);
-  
-  G4VPhysicalVolume* prism_phys =
-    new G4PVPlacement(yRot,G4ThreeVector(0,0,0),
-		      prism_log,"Prism",
-		      darkBox_log,false,0);
-  
-  
   // ------------- Surfaces --------------
   //
   // DarkBox
