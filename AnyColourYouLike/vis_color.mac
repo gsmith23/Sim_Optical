@@ -1,0 +1,110 @@
+# Use this open statement to create an OpenGL view:
+/vis/open OGL 600x600-0+0
+#
+# Use this open statement to create a .prim file suitable for
+# viewing in DAWN:
+#/vis/open DAWNFILE
+#
+# Use this open statement to create a .heprep file suitable for
+# viewing in HepRApp:
+#/vis/open HepRepFile
+#
+# Use this open statement to create a .wrl file suitable for
+# viewing in a VRML viewer:
+#/vis/open VRML2FILE
+#
+# Disable auto refresh and quieten vis messages whilst scene and
+# trajectories are established:
+#/vis/viewer/set/autoRefresh false
+/vis/verbose errors
+#
+# Draw geometry:
+/vis/drawVolume
+#
+# Specify view angle:
+#/vis/viewer/set/viewpointThetaPhi 215 -30
+/vis/viewer/set/viewpointThetaPhi -90 -89.9999
+#
+# Specify zoom value:
+/vis/viewer/zoom 1.5
+#
+# Specify style (surface or wireframe):
+#/vis/viewer/set/style wireframe
+#
+# Draw coordinate axes:
+#/vis/scene/add/axes 0 0 0 1 m
+#
+# Draw smooth trajectories at end of event, showing trajectory points
+# as markers 2 pixels wide:
+/vis/scene/add/trajectories smooth
+/vis/modeling/trajectories/create/drawByCharge
+/vis/modeling/trajectories/drawByCharge-0/default/setDrawStepPts true
+/vis/modeling/trajectories/drawByCharge-0/default/setStepPtsSize 2
+# (if too many tracks cause core dump => /tracking/storeTrajectory 0)
+#
+# Draw hits at end of event:
+#/vis/scene/add/hits
+#
+# To draw only gammas:
+#/vis/filtering/trajectories/create/particleFilter
+#/vis/filtering/trajectories/particleFilter-0/add gamma
+#
+# To invert the above, drawing all particles except gammas,
+# keep the above two lines but also add:
+#/vis/filtering/trajectories/particleFilter-0/invert true
+#
+# Many other options are available with /vis/modeling and /vis/filtering.
+# For example, to select colour by particle ID:
+#/vis/modeling/trajectories/create/drawByParticleID
+#/vis/modeling/trajectories/drawByParticleID-0/set e- blue
+#
+# To superimpose all of the events from a given run:
+/vis/scene/endOfEventAction accumulate
+#
+# Re-establish auto refreshing and verbosity:
+/vis/viewer/set/autoRefresh true
+/vis/verbose warnings
+#
+# For file-based drivers, use this to create an empty detector view:
+#/vis/viewer/flush
+
+/vis/modeling/trajectories/create/drawByAttribute
+
+/vis/modeling/trajectories/drawByAttribute-0/setAttribute IMag
+
+# https://en.wikipedia.org/wiki/Visible_spectrum      Gary corrected 
+# Violet  380–450 nm	680–790 THz	2.95–3.10 eV  3.2627417 2.7552041 
+# Blue	  450–485 nm	620–680 THz	2.64–2.75 eV  2.7552041 2.5563750
+# Cyan	  485–500 nm	600–620 THz	2.48–2.52 eV  2.5563750 2.4796837
+# Green	  500–565 nm	530–600 THz	2.25–2.34 eV  2.4796837 2.1944104
+# Yellow  565–590 nm	510–530 THz	2.10–2.17 eV  2.1944104 2.1014269
+# Orange  590–625 nm	480–510 THz	2.00–2.10 eV  2.1014269 1.9837470
+# Red	  625–740 nm	405–480 THz	1.65–2.00 eV  1.9837470 1.6754620
+
+/vis/modeling/trajectories/drawByAttribute-0/addInterval interval1 2.7552041 eV 3.2627417 eV  
+/vis/modeling/trajectories/drawByAttribute-0/addInterval interval2 2.5563750 eV 2.7552041 eV 
+/vis/modeling/trajectories/drawByAttribute-0/addInterval interval3 2.4796837 eV 2.5563750 eV 
+/vis/modeling/trajectories/drawByAttribute-0/addInterval interval4 2.1944104 eV 2.4796837 eV 
+/vis/modeling/trajectories/drawByAttribute-0/addInterval interval5 2.1014269 eV 2.1944104 eV 
+/vis/modeling/trajectories/drawByAttribute-0/addInterval interval6 1.9837470 eV 2.1014269 eV 
+/vis/modeling/trajectories/drawByAttribute-0/addInterval interval7 1.6754620 eV 1.9837470 eV 
+
+# https://academo.org/demos/wavelength-to-colour-relationship/
+
+#/vis/modeling/trajectories/drawByAttribute-0/interval1/setLineColourRGBA 118 0 237 1
+#/vis/modeling/trajectories/drawByAttribute-0/interval2/setLineColourRGBA 0 160 255 1 
+#/vis/modeling/trajectories/drawByAttribute-0/interval3/setLineColourRGBA 0 255 224 1
+#/vis/modeling/trajectories/drawByAttribute-0/interval4/setLineColourRGBA 105 255 0 1
+#/vis/modeling/trajectories/drawByAttribute-0/interval4/setLineColourRGBA 105 1 0 1
+#/vis/modeling/trajectories/drawByAttribute-0/interval5/setLineColourRGBA 249 255 0 1
+#/vis/modeling/trajectories/drawByAttribute-0/interval6/setLineColourRGBA 255 162 0 1
+#/vis/modeling/trajectories/drawByAttribute-0/interval7/setLineColourRGBA 255 0 0 1
+
+/vis/modeling/trajectories/drawByAttribute-0/interval1/setLineColourRGBA 0.46 0 0.93 0.25
+/vis/modeling/trajectories/drawByAttribute-0/interval2/setLineColourRGBA 0 0.63 1 0.25 
+/vis/modeling/trajectories/drawByAttribute-0/interval3/setLineColourRGBA 0 1 0.88 0.25
+/vis/modeling/trajectories/drawByAttribute-0/interval4/setLineColourRGBA 0.41 1 0 0.25
+/vis/modeling/trajectories/drawByAttribute-0/interval4/setLineColourRGBA 0.41 1 0 0.25
+/vis/modeling/trajectories/drawByAttribute-0/interval5/setLineColourRGBA 0.98 1 0 0.25
+/vis/modeling/trajectories/drawByAttribute-0/interval6/setLineColourRGBA 1 0.64 0 0.25
+/vis/modeling/trajectories/drawByAttribute-0/interval7/setLineColourRGBA 1 0 0 0.25

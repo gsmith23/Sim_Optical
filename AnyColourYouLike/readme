@@ -1,0 +1,48 @@
+17th April 2020 
+Side 2 Track 3 from Dark Side of the Moon
+is called 'Any Colour You Like'
+
+This program is based on the Geant4 OpNovice
+and is used to simulate a spectrum and refract
+it through a prism
+
+Email issues and suggestions to:
+gary.smith@ed.ac.uk
+
+------------
+How to Build 
+------------
+
+Make a new directory to store the build version executable
+--
+$ mkdir ../AnyColourYouLike-build/
+$ cd ../AnyColourYouLike-build/
+
+Prepare the build   
+--
+(NB this will depend on the status of your environment settings)
+See e.g. - http://geant4-userdoc.web.cern.ch/geant4-userdoc/UsersGuides/ForApplicationDeveloper/html/GettingStarted/makeFile.html#building-exampleb1-with-cmake-on-unix-with-makefiles
+
+# replace path text as appropriate
+$ cmake -DGeant4_DIR=~/software/modern/geant_install/share/Geant4-10.4.3/geant4make/ ../AnyColourYouLike/
+
+OR, if the location of Geant4Config.cmake is known by your environment 
+$ cmake ../AnyColourYouLike/
+
+Compile the executable
+--
+$ make
+
+-------------
+How to Run 
+------------
+
+Run using the GUI
+--
+$ ./ACYL
+
+(In interactive session) fire a beam of multi-coloured photons
+Session: /run/beamOn 1
+
+or just use the GUI dropbox option 
+
