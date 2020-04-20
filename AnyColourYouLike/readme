@@ -6,6 +6,11 @@ This program is based on the Geant4 OpNovice
 and is used to simulate a spectrum and refract
 it through a prism
 
+This program was make using Geant4 10.4
+For later versions of Geant4 check the
+later examples for changes:
+examples/extended/optical/
+
 Email issues and suggestions to:
 gary.smith@ed.ac.uk
 

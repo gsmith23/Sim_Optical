@@ -9,6 +9,10 @@ and is used to simulate the Edinburgh Monchromator
 equipment which was used to test the reflectivity of
 Tyvek, Aluminium, Paper and Black Paint.
 
+This program was make using Geant4 10.4
+to fix errors with later versions compare:
+examples/extended/optical/OpNovice
+
 ------------
 How to Build 
 ------------
