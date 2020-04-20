@@ -23,61 +23,40 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: MonoChromActionInitialization.cc 68058 2013-03-13 14:47:43Z gcosmo $
+// $Id$
 //
-/// \file MonoChromActionInitialization.cc
-/// \brief Implementation of the MonoChromActionInitialization class
 
-#include "MonoChromActionInitialization.hh"
-#include "MonoChromPrimaryGeneratorAction.hh"
-#include "MonoChromEventAction.hh"
-#include "MonoChromRunAction.hh"
-#include "MonoChromSteppingAction.hh"
-#include "MonoChromStackingAction.hh"
-#include "MonoChromSteppingVerbose.hh"
+#ifndef MonoChromEventAction_h
+#define MonoChromEventAction_h 1
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#include "G4UserEventAction.hh"
+#include "globals.hh"
 
-MonoChromActionInitialization::MonoChromActionInitialization()
- : G4VUserActionInitialization()
-{}
+class MonoChromRunAction;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+/// Event action class
+///
+/// In EndOfEventAction() there is collected information event per event 
+/// from Hits Collections, and accumulated statistic for 
+/// B3RunAction::EndOfRunAction().
 
-MonoChromActionInitialization::~MonoChromActionInitialization()
-{}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void MonoChromActionInitialization::BuildForMaster() const
+class MonoChromEventAction : public G4UserEventAction
 {
-  SetUserAction(new MonoChromRunAction());
-}
+  public:
+    MonoChromEventAction(MonoChromRunAction* runAction);
+    virtual ~MonoChromEventAction();
+
+    virtual void  BeginOfEventAction(const G4Event*);
+    virtual void    EndOfEventAction(const G4Event*);
+    
+  private:
+    MonoChromRunAction*  fRunAction;
+    G4int fCollID_cryst;
+    G4int fCollID_patient;   
+};
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void MonoChromActionInitialization::Build() const
-{
+#endif
 
-  MonoChromRunAction* runAction = new MonoChromRunAction();
-  SetUserAction(runAction);
-  
-  SetUserAction(new MonoChromEventAction(runAction));
-  
-  SetUserAction(new MonoChromPrimaryGeneratorAction());
-  SetUserAction(new MonoChromRunAction());
-  SetUserAction(new MonoChromSteppingAction());
-  SetUserAction(new MonoChromStackingAction());
-
-
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4VSteppingVerbose*
-MonoChromActionInitialization::InitializeSteppingVerbose() const
-{
-  return new MonoChromSteppingVerbose();
-}  
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+    

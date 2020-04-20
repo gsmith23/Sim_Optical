@@ -45,6 +45,7 @@ set(MonoChrom_SCRIPTS
     optPhoton.mac
     gui.mac
     vis.mac
+    vis_color.mac
   )
 
 foreach(_script ${MonoChrom_SCRIPTS})

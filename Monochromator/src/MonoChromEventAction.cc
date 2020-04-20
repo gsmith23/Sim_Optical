@@ -23,61 +23,91 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: MonoChromActionInitialization.cc 68058 2013-03-13 14:47:43Z gcosmo $
+// $Id$
 //
-/// \file MonoChromActionInitialization.cc
-/// \brief Implementation of the MonoChromActionInitialization class
+/// \file MonoChromEventAction.cc
+/// \brief Implementation of the MonoChromEventAction class
 
-#include "MonoChromActionInitialization.hh"
-#include "MonoChromPrimaryGeneratorAction.hh"
 #include "MonoChromEventAction.hh"
 #include "MonoChromRunAction.hh"
-#include "MonoChromSteppingAction.hh"
-#include "MonoChromStackingAction.hh"
-#include "MonoChromSteppingVerbose.hh"
+
+#include "G4RunManager.hh"
+#include "G4Event.hh"
+
+#include "G4SDManager.hh"
+#include "G4HCofThisEvent.hh"
+#include "G4THitsMap.hh"
+#include "G4UnitsTable.hh"
+#include "G4SystemOfUnits.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-MonoChromActionInitialization::MonoChromActionInitialization()
- : G4VUserActionInitialization()
+MonoChromEventAction::MonoChromEventAction(MonoChromRunAction* runAction)
+ : G4UserEventAction(), 
+   fRunAction(runAction),
+   fCollID_cryst(-1),
+   fCollID_patient(-1)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-MonoChromActionInitialization::~MonoChromActionInitialization()
-{}
+MonoChromEventAction::~MonoChromEventAction()
+{ }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void MonoChromActionInitialization::BuildForMaster() const
-{
-  SetUserAction(new MonoChromRunAction());
-}
+void MonoChromEventAction::BeginOfEventAction(const G4Event* /*evt*/)
+{ }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void MonoChromActionInitialization::Build() const
+void MonoChromEventAction::EndOfEventAction(const G4Event* evt )
 {
-
-  MonoChromRunAction* runAction = new MonoChromRunAction();
-  SetUserAction(runAction);
+  //Hits collections
+  //  
+  G4HCofThisEvent* HCE = evt->GetHCofThisEvent();
+  if(!HCE) return;
   
-  SetUserAction(new MonoChromEventAction(runAction));
+  // Get hits collections IDs
+  if (fCollID_cryst < 0) {
+    G4SDManager* SDMan = G4SDManager::GetSDMpointer();  
+    fCollID_cryst   = SDMan->GetCollectionID("photodiode/edep");
+    //fCollID_patient = SDMan->GetCollectionID("patient/dose");    
+  }
   
-  SetUserAction(new MonoChromPrimaryGeneratorAction());
-  SetUserAction(new MonoChromRunAction());
-  SetUserAction(new MonoChromSteppingAction());
-  SetUserAction(new MonoChromStackingAction());
+  //Energy in crystals : identify 'good events'
+  //
+  const G4double eThreshold = 0.1*eV;
+  G4int nbOfFired = 0;
+  
+  G4THitsMap<G4double>* evtMap = 
+    (G4THitsMap<G4double>*)(HCE->GetHC(fCollID_cryst));
+  
+  std::map<G4int,G4double*>::iterator itr;
+  for (itr = evtMap->GetMap()->begin(); itr != evtMap->GetMap()->end(); itr++) {
+    G4int copyNb  = (itr->first);
+    G4double edep = *(itr->second);
+    
+    if (edep > eThreshold) nbOfFired++;
+    
+    G4cout << "\n  photodiode " << copyNb << ": " << edep/eV << " eV " << G4endl;
 
+  }  
+  
+  //  if (nbOfFired == 2) fRunAction->CountEvent();
+  
+  // // Dose deposit in patient
+//   //
+//   G4double dose = 0.;
+     
+//   evtMap = (G4THitsMap<G4double>*)(HCE->GetHC(fCollID_patient));
+               
+//   for (itr = evtMap->GetMap()->begin(); itr != evtMap->GetMap()->end(); itr++) {
+//     ///G4int copyNb  = (itr->first);
+//     dose = *(itr->second);
+//   }
+//   //  if (dose > 0.) fRunAction->SumDose(dose);
 
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-G4VSteppingVerbose*
-MonoChromActionInitialization::InitializeSteppingVerbose() const
-{
-  return new MonoChromSteppingVerbose();
 }  
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

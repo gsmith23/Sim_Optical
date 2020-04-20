@@ -41,25 +41,26 @@
 
 class MonoChromDetectorConstruction : public G4VUserDetectorConstruction
 {
-  public:
-    MonoChromDetectorConstruction();
-    virtual ~MonoChromDetectorConstruction();
-
-  public:
-    virtual G4VPhysicalVolume* Construct();
-
-  private:
-    G4double fExpHall_x;
-    G4double fExpHall_y;
-    G4double fExpHall_z;
-
-    G4double fDarkBox_x;
-    G4double fDarkBox_y;
-    G4double fDarkBox_z;
-
-    G4double fTyvek_x;
-    G4double fTyvek_y;
-    G4double fTyvek_z;
+public:
+  MonoChromDetectorConstruction();
+  virtual ~MonoChromDetectorConstruction();
+  
+public:
+  virtual G4VPhysicalVolume* Construct();
+  virtual void ConstructSDandField();
+  
+private:
+  G4double fExpHall_x;
+  G4double fExpHall_y;
+  G4double fExpHall_z;
+  
+  G4double fDarkBox_x;
+  G4double fDarkBox_y;
+  G4double fDarkBox_z;
+  
+  G4double fTyvek_x;
+  G4double fTyvek_y;
+  G4double fTyvek_z;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
