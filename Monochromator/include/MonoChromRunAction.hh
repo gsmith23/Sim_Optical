@@ -36,6 +36,7 @@
 
 #include "globals.hh"
 #include "G4UserRunAction.hh"
+#include "G4Accumulable.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -44,16 +45,20 @@ class G4Run;
 
 class MonoChromRunAction : public G4UserRunAction
 {
-  public:
-    MonoChromRunAction();
-    virtual ~MonoChromRunAction();
-
-  public:
-    virtual void BeginOfRunAction(const G4Run* aRun);
-    virtual void EndOfRunAction(const G4Run* aRun);
-
-  private:
-    G4Timer* fTimer;
+public:
+  MonoChromRunAction();
+  virtual ~MonoChromRunAction();
+  
+  virtual void BeginOfRunAction(const G4Run* aRun);
+  virtual void EndOfRunAction(const G4Run* aRun);
+  
+  void AddEnergy(G4double edep){fEdep_total += edep;};  
+  void CountEvent()           { fGoodEvents += 1; };
+  
+private:
+  G4Timer* fTimer;
+  G4Accumulable<G4int>    fGoodEvents;
+  G4Accumulable<G4double> fEdep_total;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

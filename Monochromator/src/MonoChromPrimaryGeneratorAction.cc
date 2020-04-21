@@ -114,7 +114,7 @@ void MonoChromPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 void MonoChromPrimaryGeneratorAction::SetOptPhotonPolar()
 {
   
-  G4cout << "\n Setting Polarisation \n " << G4endl;
+  //G4cout << "\n Setting Polarisation \n " << G4endl;
   
   G4double angle = G4UniformRand() * 360.0*deg;
   SetOptPhotonPolar(angle);

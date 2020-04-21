@@ -58,7 +58,7 @@
 #include "G4LossTableManager.hh"
 #include "G4EmSaturation.hh"
 
-G4ThreadLocal G4int MonoChromPhysicsList::fVerboseLevel = 1;
+G4ThreadLocal G4int MonoChromPhysicsList::fVerboseLevel = 0;//1
 G4ThreadLocal G4int MonoChromPhysicsList::fMaxNumPhotonStep = 20;
 G4ThreadLocal G4Cerenkov* MonoChromPhysicsList::fCerenkovProcess = 0;
 G4ThreadLocal G4Scintillation* MonoChromPhysicsList::fScintillationProcess = 0;

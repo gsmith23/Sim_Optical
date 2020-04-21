@@ -59,17 +59,21 @@ void MonoChromActionInitialization::BuildForMaster() const
 void MonoChromActionInitialization::Build() const
 {
 
+  // copying B3a example ...
   MonoChromRunAction* runAction = new MonoChromRunAction();
   SetUserAction(runAction);
-  
+  // ... (as runAction is needed for EventAction) ...
   SetUserAction(new MonoChromEventAction(runAction));
+  // ... to here
   
   SetUserAction(new MonoChromPrimaryGeneratorAction());
-  SetUserAction(new MonoChromRunAction());
+  
+  // Original place for RunAction - does order matter?
+  //SetUserAction(new MonoChromRunAction());
+  
   SetUserAction(new MonoChromSteppingAction());
   SetUserAction(new MonoChromStackingAction());
-
-
+  
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

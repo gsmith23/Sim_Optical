@@ -57,15 +57,9 @@
 MonoChromDetectorConstruction::MonoChromDetectorConstruction()
  : G4VUserDetectorConstruction()
 {
-  // half lengths for boxes
-  fExpHall_x = fExpHall_y = fExpHall_z = 0.55*m;
-  fDarkBox_x = fDarkBox_y = fDarkBox_z = 0.5*m;
-
-  fTyvek_x   = fTyvek_y   = 0.25*m;
-  // http://protectiontechnologies.dupont.com/tyvek-graphics-na-product-selector
-  // 1082D 257 um thick, 105 gsm  
-  fTyvek_z   = 0.01375*cm; 
-
+  SetMaterials();
+  SetVolumes();
+  SetSurfaces();
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -74,9 +68,9 @@ MonoChromDetectorConstruction::~MonoChromDetectorConstruction(){;}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
-{
 
+void MonoChromDetectorConstruction::SetMaterials(){
+  
   // --------------------------------------
   // ------------- G4Material -------------
   
@@ -85,13 +79,13 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   //-------------
   // Air
   //
-  G4Material* air = nist->FindOrBuildMaterial("G4_AIR");
+  air = nist->FindOrBuildMaterial("G4_AIR");
   
   //-------------
   // Polyethelene
   //  /material/nist/listMaterials
-
-  G4Material* polyEth = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
+  
+  polyEth = nist->FindOrBuildMaterial("G4_POLYETHYLENE");
   
   // 1082D 257 um thick, 105 gsm
   // 275 / 105 = 0.382
@@ -101,29 +95,31 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   //  G4double tyvek_gsm       = 105.0 * g / m2;
   G4double tyvek_density   = 0.382 * g / cm3;   
   
-  G4Material* tyvek = 
-    nist->BuildMaterialWithNewDensity("TYVEK",
-				      "G4_POLYETHYLENE",
-				      tyvek_density);
+  tyvek = nist->BuildMaterialWithNewDensity("TYVEK",
+					    "G4_POLYETHYLENE",
+					    tyvek_density);
   //-------------
-  
-  // array elements for optics
-  static const G4int nElements = 2;
-  G4double photon_Energies[] = {1.7712027*eV,6.1992093*eV}; //[700,200] nm
+
+  energies[0] = 1.7712027*eV;
+  energies[1] = 6.1992093*eV; //[700,200] nm
   
   //----------------------------------------------------
+
+  G4double absorption[nIndices];   // = {1.*mm,
   
-  G4double air_R_Indices[] = {1.0,1.0};  
-  G4double pe_R_Indices[]  = {1.5,1.5};
-  G4double absorption[]    = {1.*mm,1.*mm};
+  for (int i = 0 ; i < nIndices ; i++){
+    air_RIs[i]    = 1.0;  
+    pe_RIs[i]     = 1.5;
+    absorption[i] = 1.0 * mm;
+  }
   
   G4MaterialPropertiesTable* air_Table = new G4MaterialPropertiesTable();
-  air_Table->AddProperty("RINDEX", photon_Energies, air_R_Indices, nElements);
+  air_Table->AddProperty("RINDEX",energies,air_RIs,nIndices);
   
   G4MaterialPropertiesTable* pe_Table = new G4MaterialPropertiesTable();
-  pe_Table->AddProperty("RINDEX",photon_Energies, pe_R_Indices,nElements);
-  pe_Table->AddProperty("ABSLENGTH",photon_Energies,absorption,nElements);
-
+  pe_Table->AddProperty("RINDEX",energies,pe_RIs,nIndices);
+  pe_Table->AddProperty("ABSLENGTH",energies,absorption,nIndices);
+  
   G4cout << "\n Air G4MaterialPropertiesTable" << G4endl;
   air_Table->DumpTable();
   
@@ -134,11 +130,34 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   air->SetMaterialPropertiesTable(air_Table);
   tyvek->SetMaterialPropertiesTable(pe_Table);
   polyEth->SetMaterialPropertiesTable(pe_Table);
-  
-  // --------------------------------------
-  // ------------- Volumes ----------------
-  
 
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+
+void MonoChromDetectorConstruction::SetDimensions(){
+  // half lengths for boxes
+  fExpHall_x = fExpHall_y = fExpHall_z = 0.55*m;
+  fDarkBox_x = fDarkBox_y = fDarkBox_z = 0.5*m;
+  
+  fReflectSheet_x   = fReflectSheet_y   = 0.25*m;
+  // http://protectiontechnologies.dupont.com/tyvek-graphics-na-product-selector
+  // 1082D 257 um thick, 105 gsm  
+  fReflectSheet_z   = 0.01375*cm; 
+  
+  fDetRMin = 0.;
+  fDetRMax = 5.*cm;
+  fDetDz   = 0.1*cm;
+  fDetSPhi = 0.0;
+  fDetDPhi = 2*M_PI;  
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void MonoChromDetectorConstruction::SetVolumes(){
+  
+  SetDimensions();
   
   // --------------------------------------
   // The Experimental Hall
@@ -152,8 +171,13 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
     = new G4LogicalVolume(expHall_box,air,"World",0,0,0);
   
   // Physical
-  G4VPhysicalVolume* expHall_phys
-    = new G4PVPlacement(0,G4ThreeVector(),expHall_log,"World",0,false,0);
+  expHall_phys = new G4PVPlacement(0,
+				   G4ThreeVector(),
+				   expHall_log,
+				   "World",
+				   0,
+				   false,
+				   0);
   
   // --------------------------------------
   // The Dark Box
@@ -163,40 +187,48 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   G4LogicalVolume* darkBox_log
     = new G4LogicalVolume(darkBox_box,air,"DarkBox",0,0,0);
   
-  G4VPhysicalVolume* darkBox_phys
-    = new G4PVPlacement(0,G4ThreeVector(),darkBox_log,"DarkBox",
-                        expHall_log,false,0);
+  darkBox_phys = new G4PVPlacement(0,
+				   G4ThreeVector(),
+				   darkBox_log,
+				   "DarkBox",
+				   expHall_log,
+				   false,0);
   
   // --------------------------------------
   // The Tyvek Panel
   //
-  G4Box* tyvekSheet_box = new G4Box("Tyvek",fTyvek_x,fTyvek_y,fTyvek_z);
+  G4Box* reflectSheet_box = new G4Box("Tyvek",
+				      fReflectSheet_x,
+				      fReflectSheet_y,
+				      fReflectSheet_z);
   
-  G4LogicalVolume* tyvekSheet_log
-    = new G4LogicalVolume(tyvekSheet_box,
-			  tyvek,"Tyvek",0,
+  G4LogicalVolume* reflectSheet_log
+    = new G4LogicalVolume(reflectSheet_box,
+			  tyvek,
+			  "Tyvek",0,
 			  0,
 			  0);
   
   G4RotationMatrix* yRot = new G4RotationMatrix;
   yRot->rotateY(-M_PI/4.*rad);
   
-  G4VPhysicalVolume* tyvekSheet_phys = nullptr;
-  tyvekSheet_phys = new G4PVPlacement(yRot,G4ThreeVector(0,0,0),
-				      tyvekSheet_log,"Tyvek",
-				      darkBox_log,false,0); 
+  reflectSheet_phys = new G4PVPlacement(yRot,
+					G4ThreeVector(0,0,0),
+					reflectSheet_log,
+					"Tyvek",
+					darkBox_log,
+					false,
+					0); 
   
   // --------------------------------------
   // Photodiode
-  G4double  pRMin = 0.;
-  G4double  pRMax = 5.*cm;
-  G4double  pDz   = 0.1*cm;
-  G4double  pSPhi = 0.0;
-  G4double  pDPhi = 2*M_PI;
   
   G4Tubs * detector = new G4Tubs("Detector",
-				 pRMin,pRMax,pDz,
-				 pSPhi,pDPhi);
+				 fDetRMin,
+				 fDetRMax,
+				 fDetDz,
+				 fDetSPhi,
+				 fDetDPhi);
   
   G4LogicalVolume* detector_log
     = new G4LogicalVolume(detector,
@@ -212,20 +244,24 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
 				    detector_log,"Detector",
 				    darkBox_log,false,0); 
 
-  // --------------------------------------
-  // ------------- Surfaces --------------
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void MonoChromDetectorConstruction::SetSurfaces(){
+
   //
   // DarkBox
   //
   G4OpticalSurface* opDarkBoxSurface = new G4OpticalSurface("DarkBoxSurface");
-  //  opDarkBoxSurface->SetType(dielectric_dielectric);
-  //  opDarkBoxSurface->SetFinish(ground);
-  //  opDarkBoxSurface->SetModel(unified);
+  // opDarkBoxSurface->SetType(dielectric_dielectric);
+  // opDarkBoxSurface->SetFinish(ground);
+  // opDarkBoxSurface->SetModel(unified);
   
   // G4cout << G4endl;
-//   opDarkBoxSurface->SetType(dielectric_LUTDAVIS);
-//   opDarkBoxSurface->SetFinish(Rough_LUT);
-//   opDarkBoxSurface->SetModel(DAVIS);
+  // opDarkBoxSurface->SetType(dielectric_LUTDAVIS);
+  // opDarkBoxSurface->SetFinish(Rough_LUT);
+  // opDarkBoxSurface->SetModel(DAVIS);
 
   opDarkBoxSurface->SetType(dielectric_metal);
   opDarkBoxSurface->SetFinish(polished);
@@ -303,23 +339,23 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
 
   //   G4LogicalSkinSurface* tyvekSurface =
   //     new G4LogicalSkinSurface("TyvekSurface",
-  // 			     tyvekSheet_log,
+  // 			     reflectSheet_log,
   // 			     opTyvekSurface);
   
 
-  if(tyvekSheet_phys){
+  if(reflectSheet_phys){
     G4LogicalBorderSurface* tyvekSurface =
       new G4LogicalBorderSurface("TyvekSurface",
 				 darkBox_phys,
-				 tyvekSheet_phys,
+				 reflectSheet_phys,
 				 opTyvekSurface);
   
   
     // print info
     opticalSurface = dynamic_cast <G4OpticalSurface*>
-      (tyvekSurface->GetSurface(darkBox_phys,tyvekSheet_phys)->
+      (tyvekSurface->GetSurface(darkBox_phys,reflectSheet_phys)->
        GetSurfaceProperty());
-    //(tyvekSurface->GetSurface(tyvekSheet_log)->GetSurfaceProperty());
+    //(tyvekSurface->GetSurface(reflectSheet_log)->GetSurfaceProperty());
     
     if (opticalSurface) {
       G4cout << "\n Tyvek Sheet surface properties " << G4endl;
@@ -335,26 +371,26 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   
   //--------------------------
   //  Dark Box Surface (border)
-  G4double refractiveIndex[nElements] = {1.5, 1.5};
-  // G4double specularLobe[nElements]    = {0.0, 0.0};
-  // G4double specularSpike[nElements]   = {0.0, 0.0};
-  // G4double backScatter[nElements]     = {0.0, 0.0};  
+  G4double refractiveIndex[nIndices] = {1.5, 1.5};
+  // G4double specularLobe[nIndices]    = {0.0, 0.0};
+  // G4double specularSpike[nIndices]   = {0.0, 0.0};
+  // G4double backScatter[nIndices]     = {0.0, 0.0};  
 
-  G4double darkBox_reflectivity[nElements]  = {0.0, 0.0};
-  G4double darkBox_efficiency[nElements]    = {0.0, 0.0}; 
+  G4double darkBox_reflectivity[nIndices]  = {0.0, 0.0};
+  G4double darkBox_efficiency[nIndices]    = {0.0, 0.0}; 
   
   G4MaterialPropertiesTable* darkBoxSurf_Table = new G4MaterialPropertiesTable();
 
-  darkBoxSurf_Table->AddProperty("REFLECTIVITY",photon_Energies,
-				 darkBox_reflectivity ,nElements);
-  darkBoxSurf_Table->AddProperty("EFFICIENCY",photon_Energies,
-				 darkBox_efficiency   ,nElements);
-  darkBoxSurf_Table->AddProperty("RINDEX",photon_Energies,
-				 refractiveIndex, nElements);
+  darkBoxSurf_Table->AddProperty("REFLECTIVITY",energies,
+				 darkBox_reflectivity ,nIndices);
+  darkBoxSurf_Table->AddProperty("EFFICIENCY",energies,
+				 darkBox_efficiency   ,nIndices);
+  darkBoxSurf_Table->AddProperty("RINDEX",energies,
+				 refractiveIndex, nIndices);
   
-  // darkBoxSurf_Table->AddProperty("SPECULARLOBECONSTANT",  photon_Energies, specularLobe,    nElements);
-  // darkBoxSurf_Table->AddProperty("SPECULARSPIKECONSTANT", photon_Energies, specularSpike,   nElements);
-  // darkBoxSurf_Table->AddProperty("BACKSCATTERCONSTANT",   photon_Energies, backScatter,     nElements);
+  // darkBoxSurf_Table->AddProperty("SPECULARLOBECONSTANT",  energies, specularLobe,    nIndices);
+  // darkBoxSurf_Table->AddProperty("SPECULARSPIKECONSTANT", energies, specularSpike,   nIndices);
+  // darkBoxSurf_Table->AddProperty("BACKSCATTERCONSTANT",   energies, backScatter,     nIndices);
   
   G4cout << "\n Dark Box Surface G4MaterialPropertiesTable" << G4endl;
   darkBoxSurf_Table->DumpTable();
@@ -365,36 +401,40 @@ G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
   //--------------------------
   //  Tyvek Surface 
   
-  G4double tyvek_R[nElements]   = {0.9, 0.9};
+  G4double tyvek_R[nIndices]   = {0.9, 0.9};
   // no transmission for dielectric_metal
-  //  G4double tyvek_Eff[nElements] = {1.0, 1.0}; 
+  //  G4double tyvek_Eff[nIndices] = {1.0, 1.0}; 
   
   // diffuse Lobe = 1 - (Csl + Css + cBS)
-  G4double tyvek_Csl[nElements] = {0.2, 0.2}; // spec lobe
-  G4double tyvek_Css[nElements] = {0.0, 0.0}; // spec spike
-  G4double tyvek_Cbs[nElements] = {0.0, 0.0}; // back spike
+  G4double tyvek_Csl[nIndices] = {0.2, 0.2}; // spec lobe
+  //G4double tyvek_Csl[nIndices] = {1.0, 1.0}; // spec lobe
+  G4double tyvek_Css[nIndices] = {0.0, 0.0}; // spec spike
+  G4double tyvek_Cbs[nIndices] = {0.0, 0.0}; // back spike
   
   G4MaterialPropertiesTable *tyvekSurf_Table = new G4MaterialPropertiesTable();
   
-  tyvekSurf_Table->AddProperty("REFLECTIVITY"         ,photon_Energies,
-			       tyvek_R ,nElements);
-//   tyvekSurf_Table->AddProperty("EFFICIENCY"           ,photon_Energies,
-// 			       tyvek_Eff   ,nElements);
-  tyvekSurf_Table->AddProperty("RINDEX"               ,photon_Energies,
-			       pe_R_Indices ,nElements);
-  tyvekSurf_Table->AddProperty("SPECULARLOBECONSTANT" ,photon_Energies,
-			       tyvek_Csl ,nElements);
-  tyvekSurf_Table->AddProperty("SPECULARSPIKECONSTANT",photon_Energies,
-			       tyvek_Css,nElements);
-  tyvekSurf_Table->AddProperty("BACKSCATTERCONSTANT"  ,photon_Energies,
-			       tyvek_Cbs  ,nElements);
+  tyvekSurf_Table->AddProperty("REFLECTIVITY",energies,
+			       tyvek_R ,nIndices);
+  //   tyvekSurf_Table->AddProperty("EFFICIENCY"           ,energies,
+  // 			       tyvek_Eff   ,nIndices);
+  tyvekSurf_Table->AddProperty("RINDEX",energies,
+			       pe_RIs,nIndices);
+  tyvekSurf_Table->AddProperty("SPECULARLOBECONSTANT" ,energies,
+			       tyvek_Csl ,nIndices);
+  tyvekSurf_Table->AddProperty("SPECULARSPIKECONSTANT",energies,
+			       tyvek_Css,nIndices);
+  tyvekSurf_Table->AddProperty("BACKSCATTERCONSTANT"  ,energies,
+			       tyvek_Cbs  ,nIndices);
   
   G4cout << "\n Tyvek Surface G4MaterialPropertiesTable" << G4endl;
   tyvekSurf_Table->DumpTable();
   G4cout << G4endl;
   
   opTyvekSurface->SetMaterialPropertiesTable(tyvekSurf_Table);
+}
 
+G4VPhysicalVolume* MonoChromDetectorConstruction::Construct()
+{
   // always return the physical World
   return expHall_phys;
 }

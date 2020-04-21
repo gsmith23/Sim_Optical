@@ -127,9 +127,9 @@ int main(int argc,char** argv)
   // Set mandatory initialization classes
   //
   // Detector construction
-  runManager-> SetUserInitialization(new MonoChromDetectorConstruction());
+  runManager->SetUserInitialization(new MonoChromDetectorConstruction());
   // Physics list
-  runManager-> SetUserInitialization(new MonoChromPhysicsList());
+  runManager->SetUserInitialization(new MonoChromPhysicsList());
   // User action initialization
   runManager->SetUserInitialization(new MonoChromActionInitialization());
 

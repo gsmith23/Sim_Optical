@@ -40,14 +40,14 @@ class B4DetectorConstruction;
 
 class MonoChromActionInitialization : public G4VUserActionInitialization
 {
-  public:
-    MonoChromActionInitialization();
-    virtual ~MonoChromActionInitialization();
-
-    virtual void BuildForMaster() const;
-    virtual void Build() const;
-
-    virtual G4VSteppingVerbose* InitializeSteppingVerbose() const;
+public:
+  MonoChromActionInitialization();
+  virtual ~MonoChromActionInitialization();
+  
+  virtual void BuildForMaster() const;
+  virtual void Build() const;
+  
+  virtual G4VSteppingVerbose* InitializeSteppingVerbose() const;
 };
 
 #endif

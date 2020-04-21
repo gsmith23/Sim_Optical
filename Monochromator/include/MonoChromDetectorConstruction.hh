@@ -36,6 +36,7 @@
 
 #include "globals.hh"
 #include "G4VUserDetectorConstruction.hh"
+#include "G4Material.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -50,6 +51,25 @@ public:
   virtual void ConstructSDandField();
   
 private:
+
+  void SetMaterials();
+  G4Material* air = nullptr;
+  G4Material* polyEth = nullptr;
+  G4Material* tyvek = nullptr;
+
+  static const G4int nIndices = 2;
+  G4double energies[nIndices];
+
+  G4double air_RIs[nIndices];  
+  G4double pe_RIs[nIndices];  
+
+  void SetVolumes();
+  G4VPhysicalVolume* expHall_phys = nullptr;
+  G4VPhysicalVolume* darkBox_phys = nullptr;
+  G4VPhysicalVolume* reflectSheet_phys = nullptr;
+
+
+  void SetDimensions();
   G4double fExpHall_x;
   G4double fExpHall_y;
   G4double fExpHall_z;
@@ -58,9 +78,21 @@ private:
   G4double fDarkBox_y;
   G4double fDarkBox_z;
   
-  G4double fTyvek_x;
-  G4double fTyvek_y;
-  G4double fTyvek_z;
+  G4double fReflectSheet_x;
+  G4double fReflectSheet_y;
+  G4double fReflectSheet_z;
+
+  G4double fDetRMin;
+  G4double fDetRMax;
+  G4double fDetDz;
+  G4double fDetSPhi;
+  G4double fDetDPhi;
+
+  void SetSurfaces();
+  
+  
+
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

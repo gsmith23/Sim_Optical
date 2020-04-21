@@ -50,9 +50,9 @@ class MonoChromEventAction : public G4UserEventAction
     virtual void    EndOfEventAction(const G4Event*);
     
   private:
-    MonoChromRunAction*  fRunAction;
-    G4int fCollID_cryst;
-    G4int fCollID_patient;   
+  MonoChromRunAction*  fRunAction;
+  G4int fCollectionIDphotodiode;
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

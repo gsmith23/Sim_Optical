@@ -45,8 +45,7 @@
 MonoChromEventAction::MonoChromEventAction(MonoChromRunAction* runAction)
  : G4UserEventAction(), 
    fRunAction(runAction),
-   fCollID_cryst(-1),
-   fCollID_patient(-1)
+   fCollectionIDphotodiode(-1)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -57,7 +56,8 @@ MonoChromEventAction::~MonoChromEventAction()
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
 void MonoChromEventAction::BeginOfEventAction(const G4Event* /*evt*/)
-{ }
+{ 
+}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -69,45 +69,34 @@ void MonoChromEventAction::EndOfEventAction(const G4Event* evt )
   if(!HCE) return;
   
   // Get hits collections IDs
-  if (fCollID_cryst < 0) {
+  if (fCollectionIDphotodiode < 0) {
     G4SDManager* SDMan = G4SDManager::GetSDMpointer();  
-    fCollID_cryst   = SDMan->GetCollectionID("photodiode/edep");
-    //fCollID_patient = SDMan->GetCollectionID("patient/dose");    
+    fCollectionIDphotodiode = SDMan->GetCollectionID("photodiode/edep");
   }
   
   //Energy in crystals : identify 'good events'
   //
-  const G4double eThreshold = 0.1*eV;
+  const G4double eThreshold = 0.001*eV;
   G4int nbOfFired = 0;
   
   G4THitsMap<G4double>* evtMap = 
-    (G4THitsMap<G4double>*)(HCE->GetHC(fCollID_cryst));
+    (G4THitsMap<G4double>*)(HCE->GetHC(fCollectionIDphotodiode));
   
+  G4double edep = 0.0;
   std::map<G4int,G4double*>::iterator itr;
   for (itr = evtMap->GetMap()->begin(); itr != evtMap->GetMap()->end(); itr++) {
-    G4int copyNb  = (itr->first);
-    G4double edep = *(itr->second);
+    //G4int copyNb  = (itr->first);
+    edep = *(itr->second);
     
     if (edep > eThreshold) nbOfFired++;
     
-    G4cout << "\n  photodiode " << copyNb << ": " << edep/eV << " eV " << G4endl;
-
+    //G4cout << "\n  photodiode " << edep/eV << " eV " << G4endl;
   }  
   
-  //  if (nbOfFired == 2) fRunAction->CountEvent();
-  
-  // // Dose deposit in patient
-//   //
-//   G4double dose = 0.;
-     
-//   evtMap = (G4THitsMap<G4double>*)(HCE->GetHC(fCollID_patient));
-               
-//   for (itr = evtMap->GetMap()->begin(); itr != evtMap->GetMap()->end(); itr++) {
-//     ///G4int copyNb  = (itr->first);
-//     dose = *(itr->second);
-//   }
-//   //  if (dose > 0.) fRunAction->SumDose(dose);
-
+  if(edep/eV > 0.1){
+    fRunAction->AddEnergy(edep);
+    fRunAction->CountEvent();
+  }
 }  
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
